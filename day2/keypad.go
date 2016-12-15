@@ -67,5 +67,5 @@ func main() {
 		doorCode = append(doorCode, string(positionConverter[currentPosition]))
 	}
 
-	fmt.Println("Part 1 Solution:", doorCode)
+	fmt.Println("Part 2 Solution:", doorCode)
 }
