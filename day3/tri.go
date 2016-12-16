@@ -16,18 +16,29 @@ func convert(v []string) []int {
 }
 
 func main() {
-	data, _ := ioutil.ReadFile("input.txt")
-	validTriangles := 0
-
-	for _, triangle := range strings.Split(string(data), "\n") {
-		if len(strings.Fields(triangle)) != 3 {
-			continue
+	// For part two we have to read columns..so we'll build a large vector first.
+	var sideLengths []int
+	for _, col := range [3]int{0, 1, 2} {
+		data, _ := ioutil.ReadFile("input.txt")
+		for _, row := range strings.Split(string(data), "\n") {
+			if len(strings.Fields(row)) != 3 {
+				continue
+			}
+			sides := convert(strings.Fields(row))
+			sideLengths = append(sideLengths, sides[col])
 		}
-		sides := convert(strings.Fields(triangle))
-		if sides[0]+sides[1] > sides[2] && sides[0]+sides[2] > sides[1] && sides[1]+sides[2] > sides[0] {
+	}
+
+	// Move through this vector, grabbing groups of 3 side lengths.
+	validTriangles := 0
+	for index := 0; index < len(sideLengths)/3; index++ {
+		a := sideLengths[3*index]
+		b := sideLengths[3*index+1]
+		c := sideLengths[3*index+2]
+		if a+b > c && a+c > b && b+c > a {
 			validTriangles += 1
 		}
 	}
 
-	fmt.Println("Part 1 Solution:", validTriangles)
+	fmt.Println("Part 2 Solution:", validTriangles)
 }
