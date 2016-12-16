@@ -12,3 +12,15 @@ func TestGenerateChecksum(t *testing.T) {
 		t.Error("fail")
 	}
 }
+
+func TestRotate(t *testing.T) {
+	if rotateName("a", 3) != "d" {
+		t.Error("fail!")
+	}
+	if rotateName("z", 1) != "a" {
+		t.Error("fail!")
+	}
+	if rotateName("ab-c", 2) != "cd e" {
+		t.Error("fail!")
+	}
+}

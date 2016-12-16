@@ -3,19 +3,21 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
 )
 
-func splitRoomAndChecksum(text string) (string, int, string) {
+func splitRoomAndChecksum(text string) (string, string, int, string) {
 	// Some spurious text wrangling..
 	values := strings.Split(text, "-")
+	roomWithDashes := strings.Join(values[0:len(values)-1], "-")
 	room := strings.Join(values[0:len(values)-1], "")
 	sectorAndChecksum := strings.Split(values[len(values)-1], "[")
 	sector, _ := strconv.Atoi(sectorAndChecksum[0])
 	checksum := strings.Replace(sectorAndChecksum[1], "]", "", 1)
-	return room, sector, checksum
+	return roomWithDashes, room, sector, checksum
 }
 
 func contains(values []int, target int) bool {
@@ -65,17 +67,34 @@ func generateChecksum(text string) string {
 	return strings.Join(values[0:5], "")
 }
 
+func rotateName(text string, number int) string {
+	letters := "abcdefghijklmnopqrstuvwxyz"
+	var output []string
+	for _, letter := range text {
+		if letter == '-' {
+			output = append(output, " ")
+			continue
+		}
+		startingIndex := strings.Index(letters, string(letter))
+		endingIndex := math.Mod(float64(startingIndex+number), float64(len(letters)))
+		output = append(output, string(letters[int(endingIndex)]))
+	}
+	return strings.Join(output, "")
+}
+
 func main() {
 	var validSectors []int
+	var validNames []string
 
 	data, _ := ioutil.ReadFile("input.txt")
 	for _, room := range strings.Split(string(data), "\n") {
 		if room == "" {
 			continue
 		}
-		room, sector, checksum := splitRoomAndChecksum(room)
+		roomWithDashes, room, sector, checksum := splitRoomAndChecksum(room)
 		if checksum == generateChecksum(room) {
 			validSectors = append(validSectors, sector)
+			validNames = append(validNames, rotateName(roomWithDashes, sector))
 		}
 	}
 
@@ -84,4 +103,13 @@ func main() {
 		sum += sector
 	}
 	fmt.Println("Part 1 Solution:", sum)
+	fmt.Println("Part 2 Solution:")
+	for index, _ := range validNames {
+		if !strings.Contains(validNames[index], "storage") {
+			continue
+		}
+		fmt.Print(validSectors[index])
+		fmt.Print(":")
+		fmt.Println(validNames[index])
+	}
 }
