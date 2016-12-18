@@ -17,7 +17,6 @@ func abbaSequenceIsPresent(text string) bool {
 				return true
 			}
 		}
-
 	}
 	return false
 }
