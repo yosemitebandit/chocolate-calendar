@@ -40,14 +40,14 @@ func main() {
 
 		var mostFrequentLetter letterCount
 		mostFrequentLetter.letter = 'a'
-		mostFrequentLetter.count = 0
+		mostFrequentLetter.count = 100
 		for letter, count := range letterFrequency {
-			if count > mostFrequentLetter.count {
+			if count < mostFrequentLetter.count {
 				mostFrequentLetter.letter = letter
 				mostFrequentLetter.count = count
 			}
 		}
 		code = append(code, string(mostFrequentLetter.letter))
 	}
-	fmt.Println("Part 1 Solution:", strings.Join(code, ""))
+	fmt.Println("Part 2 Solution:", strings.Join(code, ""))
 }
