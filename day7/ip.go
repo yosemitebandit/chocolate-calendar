@@ -41,6 +41,19 @@ func splitIP(text string) dividedIP {
 	return dip
 }
 
+func splitAba(text string) []string {
+	var sequences []string
+	for index, _ := range text {
+		if index+2 >= len(text) {
+			continue
+		}
+		if text[index] == text[index+2] && text[index] != text[index+1] {
+			sequences = append(sequences, text[index:index+3])
+		}
+	}
+	return sequences
+}
+
 func main() {
 	validIPs := 0
 	data, _ := ioutil.ReadFile("input.txt")
