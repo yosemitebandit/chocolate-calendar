@@ -54,8 +54,22 @@ func splitAba(text string) []string {
 	return sequences
 }
 
+func generateBab(text string) string {
+	return fmt.Sprintf("%s%s%s", string(text[1]), string(text[0]), string(text[1]))
+}
+
+func sliceOfStringsContains(input []string, target string) bool {
+	for _, v := range input {
+		if v == target {
+			return true
+		}
+	}
+	return false
+}
+
 func main() {
 	validIPs := 0
+	validSSLs := 0
 	data, _ := ioutil.ReadFile("input.txt")
 	for _, row := range strings.Split(string(data), "\n") {
 		if row == "" {
@@ -76,6 +90,24 @@ func main() {
 		if validIP {
 			validIPs += 1
 		}
+		// Part Two.
+		var vanillaAbaSequences []string
+		var bracketedAbaSequences []string
+		for _, v := range dip.vanilla {
+			vanillaAbaSequences = append(splitAba(v), vanillaAbaSequences...)
+		}
+		for _, v := range dip.bracketed {
+			for _, b := range splitAba(v) {
+				bracketedAbaSequences = append(bracketedAbaSequences, generateBab(b))
+			}
+		}
+		for _, v := range vanillaAbaSequences {
+			if sliceOfStringsContains(bracketedAbaSequences, v) {
+				validSSLs += 1
+				break
+			}
+		}
 	}
 	fmt.Println("Part 1 Solution:", validIPs)
+	fmt.Println("Part 2 Solution:", validSSLs)
 }

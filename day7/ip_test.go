@@ -77,3 +77,16 @@ func TestAbaSplit(t *testing.T) {
 		}
 	}
 }
+
+var babTests = [][2]string{
+	{"aba", "bab"},
+	{"yty", "tyt"},
+}
+
+func TestBabGeneration(t *testing.T) {
+	for _, test := range babTests {
+		if generateBab(test[0]) != test[1] {
+			t.Error("Fail on input:", test[0], "- Output was", generateBab(test[0]))
+		}
+	}
+}
