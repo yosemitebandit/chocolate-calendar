@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -24,6 +25,35 @@ func parseRotateCommand(command string) []int {
 	return []int{field, amount}
 }
 
+func rotateRow(row []string, amount int) []string {
+	newRow := make([]string, len(row))
+	for index, value := range row {
+		newRow[int(math.Mod(float64(index+amount), float64(len(row))))] = value
+	}
+	return newRow
+}
+
+func rotateCol(matrix [][]string, targetCol int, amount int) [][]string {
+	var elements []string
+	for _, row := range matrix {
+		elements = append(elements, row[targetCol])
+	}
+	result := rotateRow(elements, amount)
+	// Make a copy of the matrix.
+	var matrixCopy [][]string
+	for row := 0; row < len(matrix); row++ {
+		matrixCopy = append(matrixCopy, []string{})
+		for col := 0; col < len(matrix[0]); col++ {
+			if col == targetCol {
+				matrixCopy[row] = append(matrixCopy[row], result[row])
+			} else {
+				matrixCopy[row] = append(matrixCopy[row], ".")
+			}
+		}
+	}
+	return matrixCopy
+}
+
 func main() {
 	// Init the display.
 	const displayRows int = 6
@@ -37,7 +67,7 @@ func main() {
 
 	// Work through the instructions.
 	data, _ := ioutil.ReadFile("input.txt")
-	for _, command := range strings.Split(string(data), "\n") {
+	for commandIndex, command := range strings.Split(string(data), "\n") {
 		if command == "" {
 			continue
 		}
@@ -49,7 +79,17 @@ func main() {
 				}
 			}
 		} else if strings.Contains(command, "rotate row") {
-			fmt.Println("row!")
+			result := parseRotateCommand(command)
+			targetRow := result[0]
+			amount := result[1]
+			originalRow := display[targetRow]
+			newRow := rotateRow(originalRow[0:], amount)
+			// Convert to an array.
+			var updatedRow [50]string
+			for index, value := range newRow {
+				updatedRow[index] = value
+			}
+			display[targetRow] = updatedRow
 		} else if strings.Contains(command, "rotate column") {
 			fmt.Println("col!")
 		}
@@ -62,7 +102,8 @@ func main() {
 		}
 		fmt.Printf("\033[0;0H")
 		fmt.Println(strings.Join(output, ""))
-		time.Sleep(time.Second / 4)
+		time.Sleep(time.Second / 32)
+		fmt.Println("commandIndex:", commandIndex)
 
 	}
 
