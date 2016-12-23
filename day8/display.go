@@ -47,7 +47,7 @@ func rotateCol(matrix [][]string, targetCol int, amount int) [][]string {
 			if col == targetCol {
 				matrixCopy[row] = append(matrixCopy[row], result[row])
 			} else {
-				matrixCopy[row] = append(matrixCopy[row], ".")
+				matrixCopy[row] = append(matrixCopy[row], matrix[row][col])
 			}
 		}
 	}
@@ -91,7 +91,25 @@ func main() {
 			}
 			display[targetRow] = updatedRow
 		} else if strings.Contains(command, "rotate column") {
-			fmt.Println("col!")
+			result := parseRotateCommand(command)
+			targetCol := result[0]
+			amount := result[1]
+			// Er, convert to slice.. Gah, should've flattened this whole thing.
+			var displayCopy [][]string
+			for row := 0; row < len(display); row++ {
+				displayCopy = append(displayCopy, []string{})
+				for col := 0; col < len(display[0]); col++ {
+					displayCopy[row] = append(displayCopy[row], display[row][col])
+				}
+			}
+			// Rotate the cols.
+			displayCopy = rotateCol(displayCopy, targetCol, amount)
+			// Convert back to an array :/
+			for row := 0; row < len(displayCopy); row++ {
+				for col := 0; col < len(displayCopy[0]); col++ {
+					display[row][col] = displayCopy[row][col]
+				}
+			}
 		}
 
 		// Plot it.
@@ -102,9 +120,16 @@ func main() {
 		}
 		fmt.Printf("\033[0;0H")
 		fmt.Println(strings.Join(output, ""))
+		// Buffer the command to overwrite the last.
+		for {
+			if len([]rune(command)) >= 32 {
+				break
+			}
+			command = fmt.Sprintf("%s ", command)
+		}
+		fmt.Println("command:", commandIndex, command)
+		// Wait a bit.
 		time.Sleep(time.Second / 32)
-		fmt.Println("commandIndex:", commandIndex)
-
 	}
 
 	// Count the 'on' pixels.

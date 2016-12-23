@@ -77,6 +77,11 @@ var colRotationTests = []colRotationTest{
 		0,
 		4,
 	},
+	{[][]string{{"#", "#", "#"}, {"#", ".", "."}, {".", ".", "."}},
+		[][]string{{".", "#", "#"}, {"#", ".", "."}, {"#", ".", "."}},
+		0,
+		1,
+	},
 }
 
 func TestColRotation(t *testing.T) {
