@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"strconv"
 	"strings"
 )
@@ -28,15 +27,6 @@ func findMarker(input string) marker {
 }
 
 func decompress(input string) string {
-	fmt.Println("single round decompression input length:", len(input))
-	parensInInput := 0
-	for _, char := range input {
-		if char == '(' {
-			parensInInput++
-		}
-	}
-	fmt.Println("Parens in input:", parensInInput)
-	// Walk through the string and build the output.
 	var buffer bytes.Buffer
 	charIndex := 0
 	for {
@@ -44,7 +34,7 @@ func decompress(input string) string {
 		if char == '(' {
 			nextMarker := findMarker(input[charIndex:])
 			charIndex += nextMarker.length
-			lettersToRepeat := input[charIndex : charIndex+nextMarker.letters]
+			lettersToRepeat := decompress(input[charIndex : charIndex+nextMarker.letters])
 			for i := 0; i < nextMarker.repeats; i++ {
 				buffer.WriteString(lettersToRepeat)
 			}
@@ -56,35 +46,8 @@ func decompress(input string) string {
 		if charIndex > len(input)-1 {
 			break
 		}
-		if math.Mod(float64(charIndex), 1000) == 0 {
-			fmt.Println(float64(100*charIndex) / float64(len(input)))
-		}
 	}
 	return buffer.String()
-}
-
-func decompressV2(input string) string {
-	// Keep decompressing until there are no more markers.
-	rounds := 0
-	for {
-		//fmt.Println("Using input:", input)
-		input = decompress(input)
-		// Check for a marker.
-		noParenFound := true
-		for _, char := range input {
-			if char == '(' {
-				noParenFound = false
-				//fmt.Println("paren!")
-				break
-			}
-		}
-		if noParenFound {
-			break
-		}
-		fmt.Println(rounds)
-		rounds++
-	}
-	return input
 }
 
 func main() {
@@ -96,6 +59,6 @@ func main() {
 			input = fmt.Sprintf("%s%c", input, char)
 		}
 	}
-	output := decompressV2(input)
+	output := decompress(input)
 	fmt.Println("Part 2 Solution:", len(output))
 }
