@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -36,7 +37,7 @@ func decompress(input string) string {
 	}
 	fmt.Println("Parens in input:", parensInInput)
 	// Walk through the string and build the output.
-	output := ""
+	var buffer bytes.Buffer
 	charIndex := 0
 	for {
 		char := input[charIndex]
@@ -45,11 +46,11 @@ func decompress(input string) string {
 			charIndex += nextMarker.length
 			lettersToRepeat := input[charIndex : charIndex+nextMarker.letters]
 			for i := 0; i < nextMarker.repeats; i++ {
-				output += lettersToRepeat
+				buffer.WriteString(lettersToRepeat)
 			}
 			charIndex += nextMarker.letters
 		} else {
-			output += string(char)
+			buffer.WriteString(string(char))
 			charIndex++
 		}
 		if charIndex > len(input)-1 {
@@ -59,7 +60,7 @@ func decompress(input string) string {
 			fmt.Println(float64(100*charIndex) / float64(len(input)))
 		}
 	}
-	return output
+	return buffer.String()
 }
 
 func decompressV2(input string) string {
