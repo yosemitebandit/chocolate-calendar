@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -44,15 +45,18 @@ func decompress(input string) string {
 			charIndex += nextMarker.length
 			lettersToRepeat := input[charIndex : charIndex+nextMarker.letters]
 			for i := 0; i < nextMarker.repeats; i++ {
-				output = fmt.Sprintf("%s%s", output, lettersToRepeat)
+				output += lettersToRepeat
 			}
 			charIndex += nextMarker.letters
 		} else {
-			output = fmt.Sprintf("%s%c", output, char)
+			output += string(char)
 			charIndex++
 		}
 		if charIndex > len(input)-1 {
 			break
+		}
+		if math.Mod(float64(charIndex), 1000) == 0 {
+			fmt.Println(float64(100*charIndex) / float64(len(input)))
 		}
 	}
 	return output
