@@ -25,15 +25,15 @@ func findMarker(input string) marker {
 	return newMarker
 }
 
-func main() {
-	// Read the file and join all the lines into one long string.
-	data, _ := ioutil.ReadFile("input.txt")
-	input := ""
-	for _, line := range strings.Split(string(data), "\n") {
-		for _, char := range line {
-			input = fmt.Sprintf("%s%c", input, char)
+func decompress(input string) string {
+	fmt.Println("single round decompression input length:", len(input))
+	parensInInput := 0
+	for _, char := range input {
+		if char == '(' {
+			parensInInput++
 		}
 	}
+	fmt.Println("Parens in input:", parensInInput)
 	// Walk through the string and build the output.
 	output := ""
 	charIndex := 0
@@ -48,13 +48,49 @@ func main() {
 			}
 			charIndex += nextMarker.letters
 		} else {
-			output = fmt.Sprintf("%s%b", output, char)
+			output = fmt.Sprintf("%s%c", output, char)
 			charIndex++
 		}
 		if charIndex > len(input)-1 {
 			break
 		}
 	}
+	return output
+}
 
-	fmt.Println("Part 1 Solution:", len(output))
+func decompressV2(input string) string {
+	// Keep decompressing until there are no more markers.
+	rounds := 0
+	for {
+		//fmt.Println("Using input:", input)
+		input = decompress(input)
+		// Check for a marker.
+		noParenFound := true
+		for _, char := range input {
+			if char == '(' {
+				noParenFound = false
+				//fmt.Println("paren!")
+				break
+			}
+		}
+		if noParenFound {
+			break
+		}
+		fmt.Println(rounds)
+		rounds++
+	}
+	return input
+}
+
+func main() {
+	// Read the file and join all the lines into one long string.
+	data, _ := ioutil.ReadFile("input.txt")
+	input := ""
+	for _, line := range strings.Split(string(data), "\n") {
+		for _, char := range line {
+			input = fmt.Sprintf("%s%c", input, char)
+		}
+	}
+	output := decompressV2(input)
+	fmt.Println("Part 2 Solution:", len(output))
 }
