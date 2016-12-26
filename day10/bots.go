@@ -52,6 +52,7 @@ func main() {
 	var outputList = make([]bot, len(outputSet))
 	for outputNumber, _ := range outputSet {
 		var newOutput bot
+		newOutput.number = outputNumber
 		newOutput.isOutput = true
 		outputList[outputNumber] = newOutput
 	}
@@ -94,11 +95,19 @@ func main() {
 			botNumber, _ := strconv.Atoi(strings.Fields(line)[1])
 			givesLowTo, _ := strconv.Atoi(strings.Fields(line)[6])
 			botList[botNumber].givesLowTo = &botList[givesLowTo]
+		} else if line[0] == 'b' && strings.Contains(line, "low to output") {
+			botNumber, _ := strconv.Atoi(strings.Fields(line)[1])
+			givesLowTo, _ := strconv.Atoi(strings.Fields(line)[6])
+			botList[botNumber].givesLowTo = &outputList[givesLowTo]
 		}
 		if line[0] == 'b' && strings.Contains(line, "high to bot") {
 			botNumber, _ := strconv.Atoi(strings.Fields(line)[1])
 			givesHighTo, _ := strconv.Atoi(strings.Fields(line)[11])
 			botList[botNumber].givesHighTo = &botList[givesHighTo]
+		} else if line[0] == 'b' && strings.Contains(line, "high to output") {
+			botNumber, _ := strconv.Atoi(strings.Fields(line)[1])
+			givesHighTo, _ := strconv.Atoi(strings.Fields(line)[11])
+			botList[botNumber].givesHighTo = &outputList[givesHighTo]
 		}
 		if line[0] == 'v' {
 			value, _ := strconv.Atoi(strings.Fields(line)[1])
@@ -106,30 +115,35 @@ func main() {
 			botList[botNumber] = botList[botNumber].receive(value)
 		}
 	}
-	targetValues := [2]int{17, 61}
 	// Now walk through the bots and redistribute values until we compare the targets.
 Outer:
 	for {
 	Inner:
-		for botNumber, botInstance := range botList {
+		for _, botInstance := range botList {
 			if botInstance.holdsLow > 0 && botInstance.holdsHigh > 0 {
-				if botInstance.holdsLow == targetValues[0] && botInstance.holdsHigh == targetValues[1] {
-					fmt.Println("Part 1 Solution:", botNumber)
-					break Outer
-				}
-				if botInstance.givesLowTo != nil {
-					lowBot := *botInstance.givesLowTo
-					lowBot = lowBot.receive(botInstance.holdsLow)
+				lowBot := *botInstance.givesLowTo
+				lowBot = lowBot.receive(botInstance.holdsLow)
+				if lowBot.isOutput {
+					outputList[lowBot.number] = lowBot
+				} else {
 					botList[lowBot.number] = lowBot
 				}
 				highBot := *botInstance.givesHighTo
 				highBot = highBot.receive(botInstance.holdsHigh)
-				botList[highBot.number] = highBot
+				if highBot.isOutput {
+					outputList[highBot.number] = highBot
+				} else {
+					botList[highBot.number] = highBot
+				}
 				botInstance.holdsLow = 0
 				botInstance.holdsHigh = 0
 				botList[botInstance.number] = botInstance
 				break Inner
 			}
+		}
+		if outputList[0].holdsLow*outputList[1].holdsLow*outputList[2].holdsLow != 0 {
+			fmt.Println("Part 2 Solution:", outputList[0].holdsLow*outputList[1].holdsLow*outputList[2].holdsLow)
+			break Outer
 		}
 	}
 }
