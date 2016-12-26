@@ -13,7 +13,7 @@ func main() {
 	registers := make(map[string]int)
 	registers["a"] = 0
 	registers["b"] = 0
-	registers["c"] = 0
+	registers["c"] = 1
 	registers["d"] = 0
 
 	lines := strings.Split(string(data), "\n")
@@ -61,5 +61,5 @@ func main() {
 
 		lineIndex++
 	}
-	fmt.Println("Part 1 Solution:", registers)
+	fmt.Println("Part 2 Solution:", registers)
 }
