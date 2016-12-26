@@ -39,9 +39,9 @@ var decompressTestInstances = []decompressTestInstance{
 
 func TestDecompress(t *testing.T) {
 	for _, test := range decompressTestInstances {
-		result := decompress(test.input)
+		result := decompress(test.input, 1)
 		if len(result) != test.outputLength {
-			t.Error("D2 fail, input:", test.input, "Got:", result)
+			t.Error("decompress fail, input:", test.input, "Got:", result, "Len:", len(result))
 		}
 	}
 }

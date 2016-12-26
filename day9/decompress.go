@@ -26,7 +26,7 @@ func findMarker(input string) marker {
 	return newMarker
 }
 
-func decompress(input string) string {
+func decompress(input string, multiplier int) string {
 	var buffer bytes.Buffer
 	charIndex := 0
 	for {
@@ -34,13 +34,15 @@ func decompress(input string) string {
 		if char == '(' {
 			nextMarker := findMarker(input[charIndex:])
 			charIndex += nextMarker.length
-			lettersToRepeat := decompress(input[charIndex : charIndex+nextMarker.letters])
-			for i := 0; i < nextMarker.repeats; i++ {
-				buffer.WriteString(lettersToRepeat)
-			}
+			multiplier *= nextMarker.repeats
+			buffer.WriteString(decompress(input[charIndex:charIndex+nextMarker.letters], multiplier))
+			// Err..reset the multiplier.
+			multiplier /= nextMarker.repeats
 			charIndex += nextMarker.letters
 		} else {
-			buffer.WriteString(string(char))
+			for i := 0; i < multiplier; i++ {
+				buffer.WriteString(string(char))
+			}
 			charIndex++
 		}
 		if charIndex > len(input)-1 {
@@ -59,6 +61,7 @@ func main() {
 			input = fmt.Sprintf("%s%c", input, char)
 		}
 	}
-	output := decompress(input)
+	multiplier := 1
+	output := decompress(input, multiplier)
 	fmt.Println("Part 2 Solution:", len(output))
 }
