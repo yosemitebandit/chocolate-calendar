@@ -44,4 +44,5 @@ func main() {
 	for i := 0; i < side; i++ {
 		fmt.Println(coords[side*i : side*(i+1)])
 	}
+	// And then I counted the steps to the target for the Part 1 Solution :|
 }
